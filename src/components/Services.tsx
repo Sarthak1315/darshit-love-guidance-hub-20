@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Clock, Video, MessageCircle, Crown, Heart, Sparkles } from "lucide-react";
+import { Check, Clock, Youtube, MessageCircle, Heart, Sparkles } from "lucide-react";
 
 const Services = () => {
   const services = [
@@ -21,7 +21,7 @@ const Services = () => {
       price: "₹500",
       description: "Personal video call session to discuss your relationship challenges and life concerns",
       features: ["Private video consultation", "Personalized advice and guidance", "Follow-up action plan", "24-hour email support"],
-      icon: Video,
+      icon: Youtube,
       popular: true,
       gradient: "from-pink-500 to-purple-500"
     },
@@ -39,7 +39,9 @@ const Services = () => {
 
   return (
     <section className="py-24 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%23ff1493" fill-opacity="0.03"%3E%3Cpath d="M50 50c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10zm-20 0c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+      <div className="absolute inset-0 opacity-40" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ff1493' fill-opacity='0.03'%3E%3Cpath d='M50 50c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10zm-20 0c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
@@ -61,7 +63,7 @@ const Services = () => {
               {service.popular && (
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
                   <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
-                    <Crown className="w-4 h-4" />
+                    <Heart className="w-4 h-4" />
                     Most Popular
                   </div>
                 </div>

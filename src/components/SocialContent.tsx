@@ -1,17 +1,19 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Youtube, Instagram, ExternalLink, Play, Heart, Users, TrendingUp } from "lucide-react";
+import { Youtube, Instagram, Heart, Users, Sparkles } from "lucide-react";
 
 const SocialContent = () => {
   return (
     <section className="py-24 bg-gradient-to-br from-purple-50 via-pink-50 to-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ff69b4" fill-opacity="0.04"%3E%3Cpath d="M40 40c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20zm-20-20c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+      <div className="absolute inset-0 opacity-30" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ff69b4' fill-opacity='0.04'%3E%3Cpath d='M40 40c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20zm-20-20c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-6">
-            <TrendingUp className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" />
             My Content Universe
           </div>
           <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 to-purple-800 bg-clip-text text-transparent mb-6">
@@ -41,12 +43,6 @@ const SocialContent = () => {
               {/* First YouTube Video */}
               <Card className="overflow-hidden shadow-2xl group hover:shadow-3xl transition-all duration-500">
                 <CardContent className="p-0 relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
-                      <Play className="w-8 h-8 text-white ml-1" />
-                    </div>
-                  </div>
                   <iframe
                     width="100%"
                     height="300"
@@ -63,12 +59,6 @@ const SocialContent = () => {
               {/* Second YouTube Video */}
               <Card className="overflow-hidden shadow-2xl group hover:shadow-3xl transition-all duration-500">
                 <CardContent className="p-0 relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-2xl">
-                      <Play className="w-8 h-8 text-white ml-1" />
-                    </div>
-                  </div>
                   <iframe
                     width="100%"
                     height="300"
@@ -86,7 +76,6 @@ const SocialContent = () => {
             <Button className="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <Youtube className="w-5 h-5 mr-2" />
               Explore My YouTube
-              <ExternalLink className="w-4 h-4 ml-2" />
             </Button>
           </div>
           
@@ -120,7 +109,7 @@ const SocialContent = () => {
             <div className="grid grid-cols-2 gap-6">
               {[
                 { title: "Love Tips", gradient: "from-pink-400 to-rose-400", icon: Heart },
-                { title: "Life Advice", gradient: "from-purple-500 to-indigo-500", icon: TrendingUp },
+                { title: "Life Advice", gradient: "from-purple-500 to-indigo-500", icon: Sparkles },
                 { title: "Q&A Sessions", gradient: "from-pink-500 to-purple-500", icon: Users },
                 { title: "Success Stories", gradient: "from-indigo-500 to-purple-600", icon: Heart }
               ].map((item, index) => (
@@ -143,7 +132,6 @@ const SocialContent = () => {
             >
               <Instagram className="w-5 h-5 mr-2" />
               Follow @i_am_darshit8
-              <ExternalLink className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </div>
