@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Youtube, Instagram, Play, ExternalLink } from "lucide-react";
+import { Youtube, Instagram, ExternalLink } from "lucide-react";
 
 const SocialContent = () => {
   return (
@@ -29,17 +29,38 @@ const SocialContent = () => {
               </div>
             </div>
             
-            {/* YouTube Video Placeholder */}
+            {/* First YouTube Video */}
+            <Card className="overflow-hidden shadow-lg mb-6">
+              <CardContent className="p-0">
+                <div className="relative">
+                  <iframe
+                    width="100%"
+                    height="315"
+                    src="https://www.youtube.com/embed/Kbp_DPyJ7-w"
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="w-full aspect-video"
+                  ></iframe>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Second YouTube Video */}
             <Card className="overflow-hidden shadow-lg">
               <CardContent className="p-0">
-                <div className="relative aspect-video bg-gray-100 flex items-center justify-center group cursor-pointer hover:bg-gray-200 transition-colors">
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                      <Play className="w-8 h-8 text-white ml-1" />
-                    </div>
-                    <p className="text-gray-600 font-medium">Latest Video: "Understanding Love Languages"</p>
-                    <p className="text-sm text-gray-500 mt-1">Click to watch on YouTube</p>
-                  </div>
+                <div className="relative">
+                  <iframe
+                    width="100%"
+                    height="315"
+                    src="https://www.youtube.com/embed/CdkBGE8soYE"
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="w-full aspect-video"
+                  ></iframe>
                 </div>
               </CardContent>
             </Card>
@@ -67,7 +88,7 @@ const SocialContent = () => {
             <div className="grid grid-cols-2 gap-4">
               <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer">
                 <CardContent className="p-0">
-                  <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                  <div className="aspect-square bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center">
                     <div className="text-center text-white">
                       <Instagram className="w-8 h-8 mx-auto mb-2" />
                       <p className="text-sm font-medium">Relationship Tips</p>

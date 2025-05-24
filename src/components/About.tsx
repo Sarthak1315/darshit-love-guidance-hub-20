@@ -13,7 +13,7 @@ const About = () => {
           
           <div className="grid md:grid-cols-3 gap-8 mt-12">
             <div className="text-center p-6">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💝</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Love Guidance</h3>
@@ -21,7 +21,7 @@ const About = () => {
             </div>
             
             <div className="text-center p-6">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🌟</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Life Coaching</h3>
@@ -29,7 +29,7 @@ const About = () => {
             </div>
             
             <div className="text-center p-6">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎯</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Clarity & Purpose</h3>

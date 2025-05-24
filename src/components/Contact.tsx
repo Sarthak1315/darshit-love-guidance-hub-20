@@ -7,7 +7,7 @@ import { MapPin, Phone, Mail, Calendar, MessageCircle } from "lucide-react";
 
 const Contact = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-purple-50 to-white">
+    <section className="py-20 bg-gradient-to-br from-pink-50 to-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
@@ -52,10 +52,10 @@ const Contact = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Consultation Type</label>
-                  <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <option>One-on-One Consultation (60 min)</option>
-                    <option>Express Session (30 min)</option>
-                    <option>Ongoing Support (Monthly)</option>
+                  <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                    <option>One-on-One Consultation (60 min) - ₹500</option>
+                    <option>Express Session (30 min) - ₹300</option>
+                    <option>Ongoing Support (Monthly) - ₹1,500</option>
                   </select>
                 </div>
                 
@@ -67,7 +67,7 @@ const Contact = () => {
                   />
                 </div>
                 
-                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg">
+                <Button className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg">
                   <Calendar className="w-5 h-5 mr-2" />
                   Book My Consultation
                 </Button>
@@ -79,8 +79,8 @@ const Contact = () => {
           <div className="space-y-8">
             <Card className="p-6 shadow-lg">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-pink-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Location</h3>
@@ -91,8 +91,8 @@ const Contact = () => {
             
             <Card className="p-6 shadow-lg">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <MessageCircle className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-pink-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Response Time</h3>
@@ -103,8 +103,8 @@ const Contact = () => {
             
             <Card className="p-6 shadow-lg">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-pink-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Availability</h3>
@@ -113,9 +113,9 @@ const Contact = () => {
               </div>
             </Card>
             
-            <div className="bg-purple-100 p-6 rounded-lg">
-              <h3 className="font-semibold text-purple-900 mb-2">Why Choose Personal Consultation?</h3>
-              <ul className="space-y-2 text-purple-800">
+            <div className="bg-pink-100 p-6 rounded-lg">
+              <h3 className="font-semibold text-pink-900 mb-2">Why Choose Personal Consultation?</h3>
+              <ul className="space-y-2 text-pink-800">
                 <li>• Personalized guidance tailored to your specific situation</li>
                 <li>• Safe, confidential space to share your concerns</li>
                 <li>• Practical strategies you can implement immediately</li>

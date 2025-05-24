@@ -10,9 +10,9 @@ const Footer = () => {
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <img 
-                src="/lovable-uploads/9291eb33-271b-4ef1-b703-105b54bb6e5c.png" 
+                src="/lovable-uploads/f0bbde04-e1db-4d82-8c87-588913097ba3.png" 
                 alt="Darshit Logo" 
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
             </div>
             <p className="text-gray-400 mb-4">
@@ -23,7 +23,7 @@ const Footer = () => {
                 href="https://www.instagram.com/i_am_darshit8/?igsh=MWtqbXh6bGVqcDVweg%3D%3D#" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors"
+                className="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors"
               >
                 <Instagram className="w-5 h-5" />
               </a>
