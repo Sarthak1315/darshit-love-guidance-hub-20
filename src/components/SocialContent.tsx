@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Youtube, Instagram, Heart, Users, Sparkles } from "lucide-react";
@@ -73,7 +72,10 @@ const SocialContent = () => {
               </Card>
             </div>
             
-            <Button className="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <Button 
+              className="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              onClick={() => window.open('https://www.youtube.com/@lyosambhlovaatofficial', '_blank')}
+            >
               <Youtube className="w-5 h-5 mr-2" />
               Explore My YouTube
             </Button>
