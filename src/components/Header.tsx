@@ -6,6 +6,13 @@ import { useState } from "react";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-pink-100">
       <div className="container mx-auto px-4">
@@ -35,7 +42,10 @@ const Header = () => {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-2 rounded-full">
+            <Button 
+              onClick={scrollToContact}
+              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-2 rounded-full"
+            >
               <Heart className="w-4 h-4 mr-2" />
               Book Session
             </Button>
@@ -58,7 +68,10 @@ const Header = () => {
               <a href="#services" className="text-gray-700 hover:text-pink-600 transition-colors font-medium">Services</a>
               <a href="#content" className="text-gray-700 hover:text-pink-600 transition-colors font-medium">Content</a>
               <a href="#contact" className="text-gray-700 hover:text-pink-600 transition-colors font-medium">Contact</a>
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-2 rounded-full w-fit">
+              <Button 
+                onClick={scrollToContact}
+                className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-2 rounded-full w-fit"
+              >
                 <Heart className="w-4 h-4 mr-2" />
                 Book Session
               </Button>

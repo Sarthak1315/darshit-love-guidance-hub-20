@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,10 @@ import { useState } from "react";
 
 const CTAForm = () => {
   const [agreed, setAgreed] = useState(false);
+
+  const handleCheckboxChange = (checked: boolean | "indeterminate") => {
+    setAgreed(checked === true);
+  };
 
   return (
     <section id="contact" className="py-24 bg-gradient-to-br from-white via-pink-50 to-purple-100 relative overflow-hidden">
@@ -92,7 +95,7 @@ const CTAForm = () => {
                   <Checkbox 
                     id="agree" 
                     checked={agreed}
-                    onCheckedChange={setAgreed}
+                    onCheckedChange={handleCheckboxChange}
                     className="w-5 h-5"
                   />
                   <label htmlFor="agree" className="text-sm text-gray-700 leading-relaxed">
