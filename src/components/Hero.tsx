@@ -4,6 +4,13 @@ import { ArrowRight, Heart, Sparkles, Star, Instagram } from "lucide-react";
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 
 const Hero = () => {
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen overflow-hidden pt-20">
       <BackgroundGradientAnimation
@@ -40,7 +47,11 @@ const Hero = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mb-8">
-                <Button size="lg" className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105">
+                <Button 
+                  size="lg" 
+                  onClick={scrollToContact}
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105"
+                >
                   Get Your Guidance
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
