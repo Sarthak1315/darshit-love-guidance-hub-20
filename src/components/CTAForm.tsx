@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,7 @@ const CTAForm = () => {
 
   const handleUPIPayment = () => {
     // UPI payment details
-    const upiId = "your-upi-id@paytm"; // Replace with your actual UPI ID
+    const upiId = "darshitkorat08-1@okaxis";
     const amount = "500";
     const transactionNote = `Consultation fee - ${fullName}`;
     
