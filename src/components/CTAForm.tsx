@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,28 @@ import { useState } from "react";
 
 const CTAForm = () => {
   const [agreed, setAgreed] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [question, setQuestion] = useState("");
 
   const handleCheckboxChange = (checked: boolean | "indeterminate") => {
     setAgreed(checked === true);
+  };
+
+  const handleUPIPayment = () => {
+    // UPI payment details
+    const upiId = "your-upi-id@paytm"; // Replace with your actual UPI ID
+    const amount = "500";
+    const transactionNote = `Consultation fee - ${fullName}`;
+    
+    // Create UPI payment URL
+    const upiUrl = `upi://pay?pa=${upiId}&am=${amount}&tn=${encodeURIComponent(transactionNote)}&cu=INR`;
+    
+    // Open UPI app
+    window.location.href = upiUrl;
+    
+    // Show success message and instructions
+    alert("UPI app opening... After payment, please send a screenshot of the payment confirmation along with your question to verify your consultation booking.");
   };
 
   return (
@@ -63,12 +83,14 @@ const CTAForm = () => {
             </CardHeader>
             
             <CardContent className="p-8 space-y-6">
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">Full Name *</label>
                   <Input 
                     placeholder="Enter your full name" 
                     className="rounded-xl border-2 border-gray-200 focus:border-pink-400 transition-colors duration-300 h-12 text-lg" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     required
                   />
                 </div>
@@ -78,6 +100,8 @@ const CTAForm = () => {
                   <Input 
                     placeholder="@your_instagram_username" 
                     className="rounded-xl border-2 border-gray-200 focus:border-pink-400 transition-colors duration-300 h-12 text-lg" 
+                    value={instagram}
+                    onChange={(e) => setInstagram(e.target.value)}
                     required
                   />
                 </div>
@@ -87,6 +111,8 @@ const CTAForm = () => {
                   <Textarea 
                     placeholder="Share what's in your heart. What guidance do you seek? (relationships, love life, personal growth, life decisions, etc.)"
                     className="rounded-xl border-2 border-gray-200 focus:border-pink-400 min-h-[150px] transition-colors duration-300 text-lg"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
                     required
                   />
                 </div>
@@ -105,14 +131,19 @@ const CTAForm = () => {
                 
                 <Button 
                   className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-6 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!agreed}
+                  disabled={!agreed || !fullName || !instagram || !question}
+                  onClick={handleUPIPayment}
+                  type="button"
                 >
                   <Send className="w-6 h-6 mr-3" />
-                  Pay ₹500 and Send Your Message
+                  Pay ₹500 via UPI
                 </Button>
                 
                 <div className="text-center text-sm text-gray-500 mt-4">
-                  <p>🔒 Secure payment • 💝 Personal response guaranteed • ⚡ 24-48 hour response time</p>
+                  <p>🔒 UPI Payment • 💝 Personal response guaranteed • ⚡ 24-48 hour response time</p>
+                  <p className="mt-2 text-xs text-orange-600">
+                    ⚠️ After payment, please send screenshot + your question details for verification
+                  </p>
                 </div>
               </form>
             </CardContent>
