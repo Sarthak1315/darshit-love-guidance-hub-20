@@ -1,28 +1,17 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart, Sparkles, Star, Instagram } from "lucide-react";
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
-
 const Hero = () => {
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact');
     if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
+      contactSection.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <section className="relative min-h-screen overflow-hidden pt-20">
-      <BackgroundGradientAnimation
-        gradientBackgroundStart="rgb(255, 182, 193)"
-        gradientBackgroundEnd="rgb(147, 112, 219)"
-        firstColor="255, 105, 180"
-        secondColor="138, 43, 226"
-        thirdColor="255, 20, 147"
-        fourthColor="186, 85, 211"
-        fifthColor="255, 182, 193"
-        containerClassName="absolute inset-0"
-      >
+  return <section className="relative min-h-screen overflow-hidden pt-20">
+      <BackgroundGradientAnimation gradientBackgroundStart="rgb(255, 182, 193)" gradientBackgroundEnd="rgb(147, 112, 219)" firstColor="255, 105, 180" secondColor="138, 43, 226" thirdColor="255, 20, 147" fourthColor="186, 85, 211" fifthColor="255, 182, 193" containerClassName="absolute inset-0">
         <div className="relative z-10 container mx-auto px-4 py-20 min-h-screen flex items-center">
           <div className="flex flex-col lg:flex-row items-center gap-16 w-full">
             {/* Left Content */}
@@ -47,20 +36,11 @@ const Hero = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mb-8">
-                <Button 
-                  size="lg" 
-                  onClick={scrollToContact}
-                  className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105"
-                >
+                <Button size="lg" onClick={scrollToContact} className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105">
                   Get Your Guidance
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="border-2 border-white/30 text-white hover:bg-white/20 backdrop-blur-md px-8 py-4 rounded-full text-lg transition-all duration-300"
-                  onClick={() => window.open('https://www.instagram.com/i_am_darshit8/?igsh=MWtqbXh6bGVqcDVweg%3D%3D#', '_blank')}
-                >
+                <Button variant="outline" size="lg" onClick={() => window.open('https://www.instagram.com/i_am_darshit8/?igsh=MWtqbXh6bGVqcDVweg%3D%3D#', '_blank')} className="border-2 border-white/30 hover:bg-white/20 backdrop-blur-md px-8 py-4 rounded-full text-lg transition-all duration-300 text-zinc-950">
                   <Instagram className="mr-2 h-5 w-5" />
                   Follow on Instagram
                 </Button>
@@ -83,11 +63,7 @@ const Hero = () => {
               <div className="relative group">
                 <div className="absolute -inset-6 bg-gradient-to-r from-pink-400 to-purple-600 rounded-full blur-3xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
                 <div className="relative w-96 h-96 lg:w-[500px] lg:h-[500px] rounded-full overflow-hidden shadow-2xl border-4 border-white/30 backdrop-blur-sm">
-                  <img 
-                    src="/lovable-uploads/793ac983-fcc0-4071-919c-9a5de291435e.png" 
-                    alt="Darshit Korat - Relationship Coach"
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
+                  <img src="/lovable-uploads/793ac983-fcc0-4071-919c-9a5de291435e.png" alt="Darshit Korat - Relationship Coach" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
                 </div>
                 <div className="absolute -bottom-8 -right-8 w-28 h-28 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl animate-bounce">
                   <Heart className="w-12 h-12 text-white" />
@@ -97,8 +73,6 @@ const Hero = () => {
           </div>
         </div>
       </BackgroundGradientAnimation>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
