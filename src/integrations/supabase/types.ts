@@ -33,6 +33,60 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_submissions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          full_name: string
+          id: string
+          instagram: string
+          order_id: string | null
+          payment_id: string | null
+          payment_status: string
+          question: string
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          full_name: string
+          id?: string
+          instagram: string
+          order_id?: string | null
+          payment_id?: string | null
+          payment_status: string
+          question: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          full_name?: string
+          id?: string
+          instagram?: string
+          order_id?: string | null
+          payment_id?: string | null
+          payment_status?: string
+          question?: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
