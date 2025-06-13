@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,6 +17,8 @@ declare global {
 const CTAForm = () => {
   const [agreed, setAgreed] = useState(false);
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [instagram, setInstagram] = useState("");
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,7 +43,7 @@ const CTAForm = () => {
   };
 
   const handlePayment = async () => {
-    if (!fullName || !instagram || !question || !agreed) {
+    if (!fullName || !email || !mobile || !instagram || !question || !agreed) {
       toast({
         title: "Missing Information",
         description: "Please fill all fields and agree to the terms.",
@@ -64,6 +65,8 @@ const CTAForm = () => {
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: {
           fullName,
+          email,
+          mobile,
           instagram,
           question
         }
@@ -88,8 +91,8 @@ const CTAForm = () => {
         order_id: order.id,
         prefill: {
           name: fullName,
-          email: '', // Add email field if needed
-          contact: '', // Add contact field if needed
+          email: email,
+          contact: mobile,
         },
         theme: {
           color: '#ec4899'
@@ -118,6 +121,8 @@ const CTAForm = () => {
               });
               // Reset form
               setFullName("");
+              setEmail("");
+              setMobile("");
               setInstagram("");
               setQuestion("");
               setAgreed(false);
@@ -266,6 +271,32 @@ const CTAForm = () => {
                     disabled={loading}
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">Email Address *</label>
+                  <Input 
+                    type="email"
+                    placeholder="Enter your email address" 
+                    className="rounded-xl border-2 border-gray-200 focus:border-pink-400 transition-colors duration-300 h-12 text-lg" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">Mobile Number *</label>
+                  <Input 
+                    type="tel"
+                    placeholder="Enter your mobile number" 
+                    className="rounded-xl border-2 border-gray-200 focus:border-pink-400 transition-colors duration-300 h-12 text-lg" 
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
                 
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">Instagram Username *</label>
@@ -306,7 +337,7 @@ const CTAForm = () => {
                 
                 <Button 
                   className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-6 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!agreed || !fullName || !instagram || !question || loading}
+                  disabled={!agreed || !fullName || !email || !mobile || !instagram || !question || loading}
                   onClick={handlePayment}
                   type="button"
                 >

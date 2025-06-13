@@ -9,6 +9,8 @@ const corsHeaders = {
 
 interface OrderRequest {
   fullName: string;
+  email: string;
+  mobile: string;
   instagram: string;
   question: string;
 }
@@ -19,9 +21,9 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { fullName, instagram, question }: OrderRequest = await req.json();
+    const { fullName, email, mobile, instagram, question }: OrderRequest = await req.json();
     
-    console.log('Creating Razorpay order for:', { fullName, instagram });
+    console.log('Creating Razorpay order for:', { fullName, email, mobile, instagram });
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -42,6 +44,8 @@ const handler = async (req: Request): Promise<Response> => {
       receipt: `receipt_${Date.now()}`,
       notes: {
         fullName,
+        email,
+        mobile,
         instagram,
         question: question.substring(0, 100) // Limit note length
       }
@@ -72,6 +76,8 @@ const handler = async (req: Request): Promise<Response> => {
       .from('payment_submissions')
       .insert({
         full_name: fullName,
+        email,
+        mobile,
         instagram,
         question,
         payment_status: 'pending',

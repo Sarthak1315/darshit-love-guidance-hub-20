@@ -38,10 +38,12 @@ export type Database = {
           amount: number
           created_at: string
           currency: string
+          email: string | null
           failure_reason: string | null
           full_name: string
           id: string
           instagram: string
+          mobile: string | null
           order_id: string | null
           payment_id: string | null
           payment_status: string
@@ -55,10 +57,12 @@ export type Database = {
           amount?: number
           created_at?: string
           currency?: string
+          email?: string | null
           failure_reason?: string | null
           full_name: string
           id?: string
           instagram: string
+          mobile?: string | null
           order_id?: string | null
           payment_id?: string | null
           payment_status: string
@@ -72,10 +76,12 @@ export type Database = {
           amount?: number
           created_at?: string
           currency?: string
+          email?: string | null
           failure_reason?: string | null
           full_name?: string
           id?: string
           instagram?: string
+          mobile?: string | null
           order_id?: string | null
           payment_id?: string | null
           payment_status?: string
