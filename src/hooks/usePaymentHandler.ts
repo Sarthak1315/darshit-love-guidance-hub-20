@@ -60,7 +60,7 @@ export const usePaymentHandler = () => {
 
       // Razorpay options
       const options = {
-        key: 'rzp_test_9999999999', // Replace with your Razorpay key ID
+        key: 'jHo8JWCfGwxWrTk98Hp6xoDy',
         amount: order.amount,
         currency: order.currency,
         name: 'Darshit Korat',
@@ -97,7 +97,6 @@ export const usePaymentHandler = () => {
                 title: "Payment Successful! 🎉",
                 description: "Thank you! Darshit will respond to your question within 24-48 hours.",
               });
-              return true; // Success
             } else {
               toast({
                 title: "Payment Verification Failed",

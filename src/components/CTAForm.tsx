@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
@@ -33,9 +32,9 @@ const CTAForm = () => {
       return;
     }
 
-    const success = await handlePayment({ fullName, email, mobile, instagram, question });
-    
-    if (success) {
+    try {
+      await handlePayment({ fullName, email, mobile, instagram, question });
+      
       // Reset form on successful payment
       setFullName("");
       setEmail("");
@@ -43,6 +42,8 @@ const CTAForm = () => {
       setInstagram("");
       setQuestion("");
       setAgreed(false);
+    } catch (error) {
+      console.error('Payment submission error:', error);
     }
   };
 
