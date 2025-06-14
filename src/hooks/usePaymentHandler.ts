@@ -55,8 +55,9 @@ export const usePaymentHandler = () => {
         throw new Error('Failed to load Razorpay script. Please check your internet connection.');
       }
 
-      // Create order using Supabase edge function
-      console.log('Creating order via Supabase function...');
+      console.log('Razorpay script loaded, creating order...');
+
+      // Create order ONLY through Supabase edge function - never call Razorpay API directly
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: paymentData
       });
@@ -76,12 +77,12 @@ export const usePaymentHandler = () => {
       const { order, submissionId } = orderData;
       console.log('Order created successfully:', order.id);
 
-      // Check if Razorpay is available
+      // Ensure Razorpay is available before proceeding
       if (!window.Razorpay) {
         throw new Error('Razorpay checkout not loaded properly');
       }
 
-      // Razorpay options with proper configuration
+      // Configure Razorpay checkout options
       const options = {
         key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy',
         amount: order.amount,
@@ -103,7 +104,7 @@ export const usePaymentHandler = () => {
           setLoading(false);
           
           try {
-            // Verify payment
+            // Verify payment through Supabase edge function only
             const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-payment', {
               body: {
                 type: 'success',
@@ -153,6 +154,7 @@ export const usePaymentHandler = () => {
             setLoading(false);
             
             try {
+              // Record cancellation through Supabase edge function only
               await supabase.functions.invoke('verify-payment', {
                 body: {
                   type: 'failure',
@@ -174,16 +176,18 @@ export const usePaymentHandler = () => {
         }
       };
 
-      console.log('Opening Razorpay with options:', options);
+      console.log('Opening Razorpay checkout with options:', options);
       
       // Create and open Razorpay instance
       const rzp = new window.Razorpay(options);
       
+      // Handle payment failures through edge function only
       rzp.on('payment.failed', async function (response: any) {
         console.log('Payment failed:', response.error);
         setLoading(false);
         
         try {
+          // Record failure through Supabase edge function only
           await supabase.functions.invoke('verify-payment', {
             body: {
               type: 'failure',
@@ -204,7 +208,8 @@ export const usePaymentHandler = () => {
         });
       });
 
-      // Open Razorpay checkout
+      // Open the Razorpay checkout modal
+      console.log('Opening Razorpay checkout...');
       rzp.open();
 
     } catch (error: any) {
