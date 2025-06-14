@@ -15,21 +15,22 @@ export function useCreateRazorpayOrder() {
   const [orderResponse, setOrderResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // 1. Send form data to custom backend (Edge Function)
   const createOrder = async (paymentData: PaymentFormData) => {
     setLoading(true);
     setError(null);
     setOrderResponse(null);
 
     try {
+      // 2. Calls Razorpay backend order endpoint via Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
-        body: paymentData, // Your form data
+        body: paymentData,
       });
 
       if (error || !data?.success) {
         setError(data?.error || error?.message || "Order creation failed.");
         return null;
       }
-
       setOrderResponse(data);
       return data;
     } catch (err: any) {
