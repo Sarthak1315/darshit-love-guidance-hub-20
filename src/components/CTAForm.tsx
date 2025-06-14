@@ -1,9 +1,8 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { usePaymentHandler } from "@/hooks/usePaymentHandler";
-import { validateForm, validatePaymentForm } from "@/utils/formValidation";
+import { validateForm } from "@/utils/formValidation";
 import PaymentForm from "./PaymentForm";
 import CTAFormHeader from "./CTAFormHeader";
 
@@ -14,37 +13,12 @@ const CTAForm = () => {
   const [mobile, setMobile] = useState("");
   const [instagram, setInstagram] = useState("");
   const [question, setQuestion] = useState("");
-  const { toast } = useToast();
-  const { handlePayment, loading } = usePaymentHandler();
 
   const isFormValid = validateForm(fullName, email, mobile, instagram, question, agreed);
 
-  const onSubmit = async () => {
-    const paymentData = { fullName, email, mobile, instagram, question, agreed };
-    const validation = validatePaymentForm(paymentData);
-    
-    if (!validation.isValid) {
-      toast({
-        title: "Missing Information",
-        description: validation.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await handlePayment({ fullName, email, mobile, instagram, question });
-      
-      // Reset form on successful payment
-      setFullName("");
-      setEmail("");
-      setMobile("");
-      setInstagram("");
-      setQuestion("");
-      setAgreed(false);
-    } catch (error) {
-      console.error('Payment submission error:', error);
-    }
+  const onSubmit = () => {
+    // This is no longer needed as we're using Razorpay payment button
+    console.log('Form data:', { fullName, email, mobile, instagram, question });
   };
 
   return (
@@ -85,7 +59,7 @@ const CTAForm = () => {
                 setQuestion={setQuestion}
                 agreed={agreed}
                 setAgreed={setAgreed}
-                loading={loading}
+                loading={false}
                 onSubmit={onSubmit}
                 isFormValid={isFormValid}
               />
