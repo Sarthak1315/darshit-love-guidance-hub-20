@@ -23,12 +23,20 @@ export const usePaymentHandler = () => {
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
+      // Check if Razorpay is already loaded
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => {
+        console.log('Razorpay script loaded successfully');
         resolve(true);
       };
       script.onerror = () => {
+        console.error('Failed to load Razorpay script');
         resolve(false);
       };
       document.body.appendChild(script);
@@ -47,8 +55,6 @@ export const usePaymentHandler = () => {
         throw new Error('Failed to load Razorpay script. Please check your internet connection.');
       }
 
-      console.log('Razorpay script loaded successfully');
-
       // Create order
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: paymentData
@@ -61,9 +67,9 @@ export const usePaymentHandler = () => {
         throw new Error(error.message || 'Failed to create payment order');
       }
 
-      if (!orderData.success) {
+      if (!orderData?.success) {
         console.error('Order creation failed:', orderData);
-        throw new Error(orderData.error || orderData.details || 'Failed to create order');
+        throw new Error(orderData?.error || 'Failed to create order');
       }
 
       const { order, submissionId } = orderData;
@@ -71,11 +77,11 @@ export const usePaymentHandler = () => {
 
       // Razorpay options
       const options = {
-        key: 'jHo8JWCfGwxWrTk98Hp6xoDy',
+        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy', // Make sure this is your correct test key
         amount: order.amount,
         currency: order.currency,
         name: 'Darshit Korat',
-        description: 'Personal Guidance Session',
+        description: 'Personal Guidance Session - ₹500',
         image: '/lovable-uploads/793ac983-fcc0-4071-919c-9a5de291435e.png',
         order_id: order.id,
         prefill: {
@@ -88,9 +94,10 @@ export const usePaymentHandler = () => {
         },
         handler: async function (response: any) {
           console.log('Payment successful:', response);
+          setLoading(false);
           
-          // Verify payment
           try {
+            // Verify payment
             const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-payment', {
               body: {
                 type: 'success',
@@ -105,10 +112,15 @@ export const usePaymentHandler = () => {
 
             if (verifyError) {
               console.error('Payment verification error:', verifyError);
-              throw new Error(verifyError.message || 'Payment verification failed');
+              toast({
+                title: "Payment Verification Error",
+                description: "Payment completed but verification failed. Please contact support.",
+                variant: "destructive",
+              });
+              return;
             }
 
-            if (verifyData.success && verifyData.verified) {
+            if (verifyData?.success && verifyData?.verified) {
               toast({
                 title: "Payment Successful! 🎉",
                 description: "Thank you! Darshit will respond to your question within 24-48 hours.",
@@ -124,15 +136,16 @@ export const usePaymentHandler = () => {
             console.error('Payment verification error:', verifyError);
             toast({
               title: "Payment Verification Error",
-              description: verifyError.message || "Please contact support with your payment details.",
+              description: "Payment completed but verification failed. Please contact support.",
               variant: "destructive",
             });
           }
         },
         modal: {
           ondismiss: async function() {
-            console.log('Payment modal closed');
-            // Record payment failure/cancellation
+            console.log('Payment modal closed by user');
+            setLoading(false);
+            
             try {
               await supabase.functions.invoke('verify-payment', {
                 body: {
@@ -156,12 +169,18 @@ export const usePaymentHandler = () => {
       };
 
       console.log('Opening Razorpay with options:', options);
+      
+      // Check if Razorpay is available
+      if (!window.Razorpay) {
+        throw new Error('Razorpay is not loaded properly');
+      }
+
       const rzp = new window.Razorpay(options);
       
       rzp.on('payment.failed', async function (response: any) {
         console.log('Payment failed:', response.error);
+        setLoading(false);
         
-        // Record payment failure
         try {
           await supabase.functions.invoke('verify-payment', {
             body: {
@@ -183,17 +202,18 @@ export const usePaymentHandler = () => {
         });
       });
 
+      // Open Razorpay checkout
       rzp.open();
 
     } catch (error: any) {
       console.error('Payment error:', error);
+      setLoading(false);
+      
       toast({
         title: "Payment Error",
         description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

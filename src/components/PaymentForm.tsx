@@ -44,8 +44,15 @@ const PaymentForm = ({
     setAgreed(checked === true);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isFormValid && !loading) {
+      onSubmit();
+    }
+  };
+
   return (
-    <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+    <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-gray-700">Full Name *</label>
         <Input 
@@ -122,13 +129,12 @@ const PaymentForm = ({
       </div>
       
       <Button 
+        type="submit"
         className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-6 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={!isFormValid || loading}
-        onClick={onSubmit}
-        type="button"
       >
         <Send className="w-6 h-6 mr-3" />
-        {loading ? "Processing..." : "Pay ₹500 via Razorpay"}
+        {loading ? "Processing Payment..." : "Pay ₹500 via Razorpay"}
       </Button>
       
       <div className="text-center text-sm text-gray-500 mt-4">
