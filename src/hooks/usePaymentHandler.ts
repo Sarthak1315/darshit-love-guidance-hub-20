@@ -23,7 +23,6 @@ export const usePaymentHandler = () => {
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
-      // Check if Razorpay is already loaded
       if (window.Razorpay) {
         console.log('Razorpay already loaded');
         resolve(true);
@@ -58,7 +57,7 @@ export const usePaymentHandler = () => {
 
       console.log('Creating order through Supabase edge function...');
 
-      // Create order ONLY through Supabase edge function - NEVER call Razorpay API directly
+      // Create order ONLY through Supabase edge function
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: paymentData
       });
@@ -78,14 +77,13 @@ export const usePaymentHandler = () => {
       const { order, submissionId } = orderData;
       console.log('Order created successfully. Opening Razorpay checkout modal...');
 
-      // Ensure Razorpay checkout is available
       if (!window.Razorpay) {
         throw new Error('Razorpay checkout not available');
       }
 
-      // Configure Razorpay checkout modal options - NO API CALLS HERE, ONLY MODAL CONFIG
+      // Configure Razorpay checkout modal - NO API CALLS, ONLY MODAL CONFIG
       const options = {
-        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy', // This is the public key, safe to use in frontend
+        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy', // Public key for checkout
         amount: order.amount,
         currency: order.currency,
         name: 'Darshit Korat',
@@ -100,12 +98,16 @@ export const usePaymentHandler = () => {
         theme: {
           color: '#ec4899'
         },
+        // Disable retry to prevent additional API calls
+        retry: {
+          enabled: false
+        },
+        // Success handler - verify through Supabase ONLY
         handler: async function (response: any) {
           console.log('Payment completed successfully:', response);
           setLoading(false);
           
           try {
-            // Verify payment through Supabase edge function ONLY
             const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-payment', {
               body: {
                 type: 'success',
@@ -150,12 +152,12 @@ export const usePaymentHandler = () => {
           }
         },
         modal: {
+          // Prevent modal from making API calls on dismiss
           ondismiss: async function() {
             console.log('Payment modal dismissed by user');
             setLoading(false);
             
             try {
-              // Record cancellation through Supabase edge function ONLY
               await supabase.functions.invoke('verify-payment', {
                 body: {
                   type: 'failure',
@@ -173,22 +175,25 @@ export const usePaymentHandler = () => {
               description: "Payment was cancelled. You can try again anytime.",
               variant: "destructive",
             });
-          }
+          },
+          // Disable escape key to prevent unexpected dismissals
+          escape: false,
+          // Disable click outside to close
+          backdropclose: false
         }
       };
 
       console.log('Opening Razorpay checkout modal...');
       
-      // Create Razorpay checkout instance - THIS OPENS A MODAL, NOT A REDIRECT
+      // Create and open Razorpay checkout
       const rzp = new window.Razorpay(options);
       
-      // Handle payment failures
+      // Handle payment failures through event handler
       rzp.on('payment.failed', async function (response: any) {
         console.log('Payment failed:', response.error);
         setLoading(false);
         
         try {
-          // Record failure through Supabase edge function ONLY
           await supabase.functions.invoke('verify-payment', {
             body: {
               type: 'failure',
@@ -209,7 +214,7 @@ export const usePaymentHandler = () => {
         });
       });
 
-      // Open the Razorpay checkout modal - THIS SHOULD OPEN AS OVERLAY, NOT REDIRECT
+      // Open the modal
       rzp.open();
 
     } catch (error: any) {
