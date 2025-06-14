@@ -49,13 +49,14 @@ export const usePaymentHandler = () => {
     try {
       console.log('Starting payment process for:', paymentData.fullName);
 
-      // Load Razorpay script
+      // Load Razorpay script first
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         throw new Error('Failed to load Razorpay script. Please check your internet connection.');
       }
 
-      // Create order
+      // Create order using Supabase edge function
+      console.log('Creating order via Supabase function...');
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: paymentData
       });
@@ -75,9 +76,14 @@ export const usePaymentHandler = () => {
       const { order, submissionId } = orderData;
       console.log('Order created successfully:', order.id);
 
-      // Razorpay options
+      // Check if Razorpay is available
+      if (!window.Razorpay) {
+        throw new Error('Razorpay checkout not loaded properly');
+      }
+
+      // Razorpay options with proper configuration
       const options = {
-        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy', // Make sure this is your correct test key
+        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy',
         amount: order.amount,
         currency: order.currency,
         name: 'Darshit Korat',
@@ -170,11 +176,7 @@ export const usePaymentHandler = () => {
 
       console.log('Opening Razorpay with options:', options);
       
-      // Check if Razorpay is available
-      if (!window.Razorpay) {
-        throw new Error('Razorpay is not loaded properly');
-      }
-
+      // Create and open Razorpay instance
       const rzp = new window.Razorpay(options);
       
       rzp.on('payment.failed', async function (response: any) {
