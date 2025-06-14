@@ -21,6 +21,32 @@ interface PaymentFailure {
   submissionId: string;
 }
 
+// Enhanced input validation
+const validateVerificationInput = (data: any): { isValid: boolean; error: string } => {
+  if (data.type === 'success') {
+    const required = ['razorpay_payment_id', 'razorpay_order_id', 'razorpay_signature', 'submissionId'];
+    for (const field of required) {
+      if (!data[field] || typeof data[field] !== 'string') {
+        return { isValid: false, error: `Missing or invalid ${field}` };
+      }
+    }
+    
+    // Validate format of payment IDs
+    if (!data.razorpay_payment_id.startsWith('pay_') || 
+        !data.razorpay_order_id.startsWith('order_')) {
+      return { isValid: false, error: 'Invalid payment ID format' };
+    }
+  } else if (data.type === 'failure') {
+    if (!data.submissionId || typeof data.submissionId !== 'string') {
+      return { isValid: false, error: 'Missing submission ID' };
+    }
+  } else {
+    return { isValid: false, error: 'Invalid request type' };
+  }
+  
+  return { isValid: true, error: '' };
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -28,7 +54,14 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body = await req.json();
-    console.log('Payment verification request:', body);
+    console.log('Payment verification request type:', body.type);
+
+    // Validate input
+    const validation = validateVerificationInput(body);
+    if (!validation.isValid) {
+      console.error('Validation error:', validation.error);
+      throw new Error(validation.error);
+    }
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -41,7 +74,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Verify payment signature
       const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET');
       if (!razorpayKeySecret) {
-        throw new Error('Razorpay secret not configured');
+        throw new Error('Payment verification service not configured');
       }
 
       // Create signature verification using crypto
@@ -65,7 +98,7 @@ const handler = async (req: Request): Promise<Response> => {
       const isSignatureValid = generated_signature === razorpay_signature;
       console.log('Signature validation result:', isSignatureValid);
 
-      // Update payment submission
+      // Update payment submission with enhanced error handling
       const { data: updateData, error: dbError } = await supabase
         .from('payment_submissions')
         .update({
@@ -73,7 +106,7 @@ const handler = async (req: Request): Promise<Response> => {
           razorpay_payment_id,
           razorpay_order_id,
           razorpay_signature,
-          failure_reason: isSignatureValid ? null : 'Invalid signature',
+          failure_reason: isSignatureValid ? null : 'Invalid payment signature',
           updated_at: new Date().toISOString()
         })
         .eq('id', submissionId)
@@ -82,10 +115,10 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (dbError) {
         console.error('Database error during update:', dbError);
-        throw new Error(`Database error: ${dbError.message}`);
+        throw new Error('Failed to update payment status');
       }
 
-      console.log('Payment verification completed:', updateData.id);
+      console.log('Payment verification completed for submission:', updateData.id);
 
       return new Response(JSON.stringify({
         success: true,
@@ -102,13 +135,18 @@ const handler = async (req: Request): Promise<Response> => {
     } else if (body.type === 'failure') {
       const { order_id, payment_id, error_description, submissionId }: PaymentFailure = body;
 
+      // Sanitize error description
+      const sanitizedErrorDescription = error_description ? 
+        error_description.replace(/[<>"\';\\]/g, '').substring(0, 200) : 
+        'Payment failed';
+
       // Update payment submission with failure
       const { data: updateData, error: dbError } = await supabase
         .from('payment_submissions')
         .update({
           payment_status: 'failed',
           payment_id: payment_id || null,
-          failure_reason: error_description,
+          failure_reason: sanitizedErrorDescription,
           updated_at: new Date().toISOString()
         })
         .eq('id', submissionId)
@@ -117,10 +155,10 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (dbError) {
         console.error('Database error during failure update:', dbError);
-        throw new Error(`Database error: ${dbError.message}`);
+        throw new Error('Failed to update payment failure status');
       }
 
-      console.log('Payment failure recorded:', updateData.id);
+      console.log('Payment failure recorded for submission:', updateData.id);
 
       return new Response(JSON.stringify({
         success: true,
@@ -138,14 +176,19 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error('Error in verify-payment function:', error);
+    
+    // Return user-friendly error message
+    const userMessage = error.message.includes('Missing') || error.message.includes('Invalid') 
+      ? 'Invalid payment verification request' 
+      : 'Payment verification service temporarily unavailable';
+    
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message || 'Unknown error occurred',
-        details: error.toString()
+        error: userMessage
       }),
       {
-        status: 500,
+        status: 400,
         headers: { 
           'Content-Type': 'application/json', 
           ...corsHeaders 

@@ -1,7 +1,8 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { paymentRateLimiter } from "@/utils/rateLimiter";
+import { sanitizeInput } from "@/utils/formValidation";
 
 declare global {
   interface Window {
@@ -44,10 +45,41 @@ export const usePaymentHandler = () => {
   };
 
   const handlePayment = async (paymentData: PaymentData) => {
+    // Check rate limit first
+    const userIdentifier = paymentData.email || paymentData.mobile;
+    const rateLimitResult = paymentRateLimiter.recordAttempt(userIdentifier);
+    
+    if (!rateLimitResult.allowed) {
+      const blockTimeMinutes = rateLimitResult.blockTimeMs ? Math.ceil(rateLimitResult.blockTimeMs / (1000 * 60)) : 60;
+      toast({
+        title: "Too Many Attempts",
+        description: `Please wait ${blockTimeMinutes} minutes before trying again to prevent abuse.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (rateLimitResult.remainingAttempts <= 1) {
+      toast({
+        title: "Rate Limit Warning",
+        description: `You have ${rateLimitResult.remainingAttempts} attempt(s) remaining before being temporarily blocked.`,
+        variant: "destructive",
+      });
+    }
+
     setLoading(true);
 
     try {
       console.log('Starting payment process for:', paymentData.fullName);
+
+      // Sanitize all input data before processing
+      const sanitizedData = {
+        fullName: sanitizeInput(paymentData.fullName),
+        email: sanitizeInput(paymentData.email),
+        mobile: sanitizeInput(paymentData.mobile),
+        instagram: sanitizeInput(paymentData.instagram),
+        question: sanitizeInput(paymentData.question)
+      };
 
       // Load Razorpay checkout script first
       const scriptLoaded = await loadRazorpayScript();
@@ -57,31 +89,31 @@ export const usePaymentHandler = () => {
 
       console.log('Creating order through Supabase edge function...');
 
-      // Create order ONLY through Supabase edge function
+      // Create order ONLY through Supabase edge function with sanitized data
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
-        body: paymentData
+        body: sanitizedData
       });
 
       console.log('Order creation response:', orderData);
 
       if (error) {
         console.error('Order creation error:', error);
-        throw new Error(error.message || 'Failed to create payment order');
+        throw new Error('Payment service temporarily unavailable. Please try again later.');
       }
 
       if (!orderData?.success) {
         console.error('Order creation failed:', orderData);
-        throw new Error(orderData?.error || 'Failed to create order');
+        throw new Error('Unable to create payment order. Please verify your details and try again.');
       }
 
       const { order, submissionId } = orderData;
       console.log('Order created successfully. Opening Razorpay checkout modal...');
 
       if (!window.Razorpay) {
-        throw new Error('Razorpay checkout not available');
+        throw new Error('Payment system not available. Please refresh the page and try again.');
       }
 
-      // Configure Razorpay checkout modal - NO API CALLS, ONLY MODAL CONFIG
+      // Configure Razorpay checkout modal with enhanced security
       const options = {
         key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy', // Public key for checkout
         amount: order.amount,
@@ -91,9 +123,9 @@ export const usePaymentHandler = () => {
         image: '/lovable-uploads/793ac983-fcc0-4071-919c-9a5de291435e.png',
         order_id: order.id,
         prefill: {
-          name: paymentData.fullName,
-          email: paymentData.email,
-          contact: paymentData.mobile,
+          name: sanitizedData.fullName,
+          email: sanitizedData.email,
+          contact: sanitizedData.mobile,
         },
         theme: {
           color: '#ec4899'
@@ -124,7 +156,7 @@ export const usePaymentHandler = () => {
               console.error('Payment verification error:', verifyError);
               toast({
                 title: "Payment Verification Error",
-                description: "Payment completed but verification failed. Please contact support.",
+                description: "Payment completed but verification failed. Please contact support with your payment ID.",
                 variant: "destructive",
               });
               return;
@@ -138,7 +170,7 @@ export const usePaymentHandler = () => {
             } else {
               toast({
                 title: "Payment Verification Failed",
-                description: "Please contact support with your payment details.",
+                description: "Please contact support with your payment details for assistance.",
                 variant: "destructive",
               });
             }
@@ -146,13 +178,13 @@ export const usePaymentHandler = () => {
             console.error('Payment verification error:', verifyError);
             toast({
               title: "Payment Verification Error",
-              description: "Payment completed but verification failed. Please contact support.",
+              description: "Payment completed but verification failed. Please save your payment ID and contact support.",
               variant: "destructive",
             });
           }
         },
         modal: {
-          // Prevent modal from making API calls on dismiss
+          // Handle modal dismissal securely
           ondismiss: async function() {
             console.log('Payment modal dismissed by user');
             setLoading(false);
@@ -176,9 +208,8 @@ export const usePaymentHandler = () => {
               variant: "destructive",
             });
           },
-          // Disable escape key to prevent unexpected dismissals
+          // Security settings
           escape: false,
-          // Disable click outside to close
           backdropclose: false
         }
       };
@@ -188,7 +219,7 @@ export const usePaymentHandler = () => {
       // Create and open Razorpay checkout
       const rzp = new window.Razorpay(options);
       
-      // Handle payment failures through event handler
+      // Handle payment failures securely
       rzp.on('payment.failed', async function (response: any) {
         console.log('Payment failed:', response.error);
         setLoading(false);
@@ -199,7 +230,7 @@ export const usePaymentHandler = () => {
               type: 'failure',
               order_id: order.id,
               payment_id: response.error.metadata?.payment_id,
-              error_description: response.error.description,
+              error_description: 'Payment processing failed',
               submissionId
             }
           });
@@ -209,7 +240,7 @@ export const usePaymentHandler = () => {
 
         toast({
           title: "Payment Failed",
-          description: response.error.description || "Payment failed. Please try again.",
+          description: "Payment could not be processed. Please try again or contact support if the issue persists.",
           variant: "destructive",
         });
       });
@@ -221,9 +252,14 @@ export const usePaymentHandler = () => {
       console.error('Payment error:', error);
       setLoading(false);
       
+      // Provide user-friendly error messages without exposing system details
+      const userMessage = error.message.includes('network') || error.message.includes('connection') 
+        ? "Network error. Please check your connection and try again."
+        : error.message || "Something went wrong. Please try again or contact support.";
+      
       toast({
         title: "Payment Error",
-        description: error.message || "Something went wrong. Please try again.",
+        description: userMessage,
         variant: "destructive",
       });
     }
