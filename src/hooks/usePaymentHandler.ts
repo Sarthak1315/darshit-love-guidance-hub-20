@@ -25,6 +25,7 @@ export const usePaymentHandler = () => {
     return new Promise((resolve) => {
       // Check if Razorpay is already loaded
       if (window.Razorpay) {
+        console.log('Razorpay already loaded');
         resolve(true);
         return;
       }
@@ -32,11 +33,11 @@ export const usePaymentHandler = () => {
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => {
-        console.log('Razorpay script loaded successfully');
+        console.log('Razorpay checkout script loaded successfully');
         resolve(true);
       };
       script.onerror = () => {
-        console.error('Failed to load Razorpay script');
+        console.error('Failed to load Razorpay checkout script');
         resolve(false);
       };
       document.body.appendChild(script);
@@ -49,15 +50,15 @@ export const usePaymentHandler = () => {
     try {
       console.log('Starting payment process for:', paymentData.fullName);
 
-      // Load Razorpay script first
+      // Load Razorpay checkout script first
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        throw new Error('Failed to load Razorpay script. Please check your internet connection.');
+        throw new Error('Failed to load Razorpay checkout script. Please check your internet connection.');
       }
 
-      console.log('Razorpay script loaded, creating order...');
+      console.log('Creating order through Supabase edge function...');
 
-      // Create order ONLY through Supabase edge function - never call Razorpay API directly
+      // Create order ONLY through Supabase edge function - NEVER call Razorpay API directly
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: paymentData
       });
@@ -75,16 +76,16 @@ export const usePaymentHandler = () => {
       }
 
       const { order, submissionId } = orderData;
-      console.log('Order created successfully:', order.id);
+      console.log('Order created successfully. Opening Razorpay checkout modal...');
 
-      // Ensure Razorpay is available before proceeding
+      // Ensure Razorpay checkout is available
       if (!window.Razorpay) {
-        throw new Error('Razorpay checkout not loaded properly');
+        throw new Error('Razorpay checkout not available');
       }
 
-      // Configure Razorpay checkout options
+      // Configure Razorpay checkout modal options - NO API CALLS HERE, ONLY MODAL CONFIG
       const options = {
-        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy',
+        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy', // This is the public key, safe to use in frontend
         amount: order.amount,
         currency: order.currency,
         name: 'Darshit Korat',
@@ -100,11 +101,11 @@ export const usePaymentHandler = () => {
           color: '#ec4899'
         },
         handler: async function (response: any) {
-          console.log('Payment successful:', response);
+          console.log('Payment completed successfully:', response);
           setLoading(false);
           
           try {
-            // Verify payment through Supabase edge function only
+            // Verify payment through Supabase edge function ONLY
             const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-payment', {
               body: {
                 type: 'success',
@@ -150,11 +151,11 @@ export const usePaymentHandler = () => {
         },
         modal: {
           ondismiss: async function() {
-            console.log('Payment modal closed by user');
+            console.log('Payment modal dismissed by user');
             setLoading(false);
             
             try {
-              // Record cancellation through Supabase edge function only
+              // Record cancellation through Supabase edge function ONLY
               await supabase.functions.invoke('verify-payment', {
                 body: {
                   type: 'failure',
@@ -176,18 +177,18 @@ export const usePaymentHandler = () => {
         }
       };
 
-      console.log('Opening Razorpay checkout with options:', options);
+      console.log('Opening Razorpay checkout modal...');
       
-      // Create and open Razorpay instance
+      // Create Razorpay checkout instance - THIS OPENS A MODAL, NOT A REDIRECT
       const rzp = new window.Razorpay(options);
       
-      // Handle payment failures through edge function only
+      // Handle payment failures
       rzp.on('payment.failed', async function (response: any) {
         console.log('Payment failed:', response.error);
         setLoading(false);
         
         try {
-          // Record failure through Supabase edge function only
+          // Record failure through Supabase edge function ONLY
           await supabase.functions.invoke('verify-payment', {
             body: {
               type: 'failure',
@@ -208,8 +209,7 @@ export const usePaymentHandler = () => {
         });
       });
 
-      // Open the Razorpay checkout modal
-      console.log('Opening Razorpay checkout...');
+      // Open the Razorpay checkout modal - THIS SHOULD OPEN AS OVERLAY, NOT REDIRECT
       rzp.open();
 
     } catch (error: any) {
