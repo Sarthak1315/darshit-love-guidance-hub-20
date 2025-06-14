@@ -30,12 +30,16 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Create Razorpay order
+    // Get Razorpay credentials
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID');
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET');
 
+    console.log('Razorpay Key ID available:', !!razorpayKeyId);
+    console.log('Razorpay Key Secret available:', !!razorpayKeySecret);
+
     if (!razorpayKeyId || !razorpayKeySecret) {
-      throw new Error('Razorpay credentials not configured');
+      console.error('Razorpay credentials missing');
+      throw new Error('Razorpay credentials not configured properly');
     }
 
     const orderData = {
@@ -51,6 +55,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     };
 
+    console.log('Creating Razorpay order with data:', orderData);
+
     const auth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
     
     const razorpayResponse = await fetch('https://api.razorpay.com/v1/orders', {
@@ -63,13 +69,13 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (!razorpayResponse.ok) {
-      const error = await razorpayResponse.text();
-      console.error('Razorpay order creation failed:', error);
-      throw new Error(`Razorpay order creation failed: ${error}`);
+      const errorText = await razorpayResponse.text();
+      console.error('Razorpay API error:', errorText);
+      throw new Error(`Razorpay order creation failed: ${errorText}`);
     }
 
     const order = await razorpayResponse.json();
-    console.log('Razorpay order created:', order.id);
+    console.log('Razorpay order created successfully:', order.id);
 
     // Store initial payment submission with pending status
     const { data, error: dbError } = await supabase
@@ -93,7 +99,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Database error: ${dbError.message}`);
     }
 
-    console.log('Payment submission created:', data.id);
+    console.log('Payment submission created successfully:', data.id);
 
     return new Response(JSON.stringify({
       success: true,
@@ -112,7 +118,8 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error.message || 'Unknown error occurred',
+        details: error.toString()
       }),
       {
         status: 500,

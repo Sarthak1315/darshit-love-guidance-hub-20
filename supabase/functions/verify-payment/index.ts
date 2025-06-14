@@ -44,18 +44,29 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error('Razorpay secret not configured');
       }
 
-      // Create signature verification
-      const crypto = await import('node:crypto');
-      const generated_signature = crypto
-        .createHmac('sha256', razorpayKeySecret)
-        .update(razorpay_order_id + "|" + razorpay_payment_id)
-        .digest('hex');
+      // Create signature verification using crypto
+      const encoder = new TextEncoder();
+      const data = encoder.encode(razorpay_order_id + "|" + razorpay_payment_id);
+      const key = encoder.encode(razorpayKeySecret);
+      
+      const cryptoKey = await crypto.subtle.importKey(
+        'raw',
+        key,
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      
+      const signature = await crypto.subtle.sign('HMAC', cryptoKey, data);
+      const generated_signature = Array.from(new Uint8Array(signature))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
 
       const isSignatureValid = generated_signature === razorpay_signature;
-      console.log('Signature valid:', isSignatureValid);
+      console.log('Signature validation result:', isSignatureValid);
 
       // Update payment submission
-      const { data, error: dbError } = await supabase
+      const { data: updateData, error: dbError } = await supabase
         .from('payment_submissions')
         .update({
           payment_status: isSignatureValid ? 'success' : 'failed',
@@ -70,16 +81,16 @@ const handler = async (req: Request): Promise<Response> => {
         .single();
 
       if (dbError) {
-        console.error('Database error:', dbError);
+        console.error('Database error during update:', dbError);
         throw new Error(`Database error: ${dbError.message}`);
       }
 
-      console.log('Payment submission updated:', data.id);
+      console.log('Payment verification completed:', updateData.id);
 
       return new Response(JSON.stringify({
         success: true,
         verified: isSignatureValid,
-        submission: data
+        submission: updateData
       }), {
         status: 200,
         headers: {
@@ -92,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
       const { order_id, payment_id, error_description, submissionId }: PaymentFailure = body;
 
       // Update payment submission with failure
-      const { data, error: dbError } = await supabase
+      const { data: updateData, error: dbError } = await supabase
         .from('payment_submissions')
         .update({
           payment_status: 'failed',
@@ -105,15 +116,15 @@ const handler = async (req: Request): Promise<Response> => {
         .single();
 
       if (dbError) {
-        console.error('Database error:', dbError);
+        console.error('Database error during failure update:', dbError);
         throw new Error(`Database error: ${dbError.message}`);
       }
 
-      console.log('Payment failure recorded:', data.id);
+      console.log('Payment failure recorded:', updateData.id);
 
       return new Response(JSON.stringify({
         success: true,
-        submission: data
+        submission: updateData
       }), {
         status: 200,
         headers: {
@@ -130,7 +141,8 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error.message || 'Unknown error occurred',
+        details: error.toString()
       }),
       {
         status: 500,

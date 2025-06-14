@@ -39,24 +39,35 @@ export const usePaymentHandler = () => {
     setLoading(true);
 
     try {
+      console.log('Starting payment process for:', paymentData.fullName);
+
       // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        throw new Error('Failed to load Razorpay script');
+        throw new Error('Failed to load Razorpay script. Please check your internet connection.');
       }
+
+      console.log('Razorpay script loaded successfully');
 
       // Create order
       const { data: orderData, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: paymentData
       });
 
-      if (error) throw error;
+      console.log('Order creation response:', orderData);
+
+      if (error) {
+        console.error('Order creation error:', error);
+        throw new Error(error.message || 'Failed to create payment order');
+      }
 
       if (!orderData.success) {
-        throw new Error(orderData.error || 'Failed to create order');
+        console.error('Order creation failed:', orderData);
+        throw new Error(orderData.error || orderData.details || 'Failed to create order');
       }
 
       const { order, submissionId } = orderData;
+      console.log('Order created successfully:', order.id);
 
       // Razorpay options
       const options = {
@@ -90,7 +101,12 @@ export const usePaymentHandler = () => {
               }
             });
 
-            if (verifyError) throw verifyError;
+            console.log('Payment verification response:', verifyData);
+
+            if (verifyError) {
+              console.error('Payment verification error:', verifyError);
+              throw new Error(verifyError.message || 'Payment verification failed');
+            }
 
             if (verifyData.success && verifyData.verified) {
               toast({
@@ -104,11 +120,11 @@ export const usePaymentHandler = () => {
                 variant: "destructive",
               });
             }
-          } catch (verifyError) {
+          } catch (verifyError: any) {
             console.error('Payment verification error:', verifyError);
             toast({
               title: "Payment Verification Error",
-              description: "Please contact support with your payment details.",
+              description: verifyError.message || "Please contact support with your payment details.",
               variant: "destructive",
             });
           }
@@ -139,6 +155,7 @@ export const usePaymentHandler = () => {
         }
       };
 
+      console.log('Opening Razorpay with options:', options);
       const rzp = new window.Razorpay(options);
       
       rzp.on('payment.failed', async function (response: any) {
