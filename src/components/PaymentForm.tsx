@@ -4,7 +4,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 interface PaymentFormProps {
   fullName: string;
@@ -41,28 +40,12 @@ const PaymentForm = ({
   onSubmit,
   isFormValid
 }: PaymentFormProps) => {
-  const paymentButtonRef = useRef<HTMLDivElement>(null);
-
   const handleCheckboxChange = (checked: boolean | "indeterminate") => {
     setAgreed(checked === true);
   };
 
-  useEffect(() => {
-    // Load Razorpay payment button script when form is valid
-    if (isFormValid && paymentButtonRef.current) {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
-      script.setAttribute('data-payment_button_id', 'pl_Qh0yf65kkgJLE5');
-      script.async = true;
-      
-      // Clear previous script if any
-      paymentButtonRef.current.innerHTML = '';
-      paymentButtonRef.current.appendChild(script);
-    }
-  }, [isFormValid]);
-
   return (
-    <div className="space-y-6">
+    <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-gray-700">Full Name *</label>
         <Input 
@@ -138,27 +121,23 @@ const PaymentForm = ({
         </label>
       </div>
       
-      {isFormValid ? (
-        <div className="w-full">
-          <div ref={paymentButtonRef} className="w-full flex justify-center"></div>
-          <div className="text-center text-sm text-gray-500 mt-4">
-            <p>🔒 Secure Payment via Razorpay • 💝 Personal response guaranteed • ⚡ 24-48 hour response time</p>
-            <p className="mt-2 text-xs text-orange-600">
-              ⚠️ Your form details will be saved regardless of payment status
-            </p>
-          </div>
-        </div>
-      ) : (
-        <Button 
-          className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-6 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={true}
-          type="button"
-        >
-          <Send className="w-6 h-6 mr-3" />
-          Complete all fields to proceed
-        </Button>
-      )}
-    </div>
+      <Button 
+        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-6 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!isFormValid || loading}
+        onClick={onSubmit}
+        type="button"
+      >
+        <Send className="w-6 h-6 mr-3" />
+        {loading ? "Processing..." : "Pay ₹500 via Razorpay"}
+      </Button>
+      
+      <div className="text-center text-sm text-gray-500 mt-4">
+        <p>🔒 Secure Payment via Razorpay • 💝 Personal response guaranteed • ⚡ 24-48 hour response time</p>
+        <p className="mt-2 text-xs text-orange-600">
+          ⚠️ Your form details will be saved regardless of payment status
+        </p>
+      </div>
+    </form>
   );
 };
 
