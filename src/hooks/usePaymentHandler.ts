@@ -113,9 +113,9 @@ export const usePaymentHandler = () => {
         throw new Error('Payment system not available. Please refresh the page and try again.');
       }
 
-      // Configure Razorpay checkout modal with enhanced security
+      // Configure Razorpay checkout modal with updated public key
       const options = {
-        key: 'rzp_test_jHo8JWCfGwxWrTk98Hp6xoDy', // Public key for checkout
+        key: 'rzp_test_A6pSWlfF6x7uF3', // Updated public key
         amount: order.amount,
         currency: order.currency,
         name: 'Darshit Korat',
